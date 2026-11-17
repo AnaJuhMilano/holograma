@@ -209,11 +209,17 @@
   <!-- Script de Inicialização do WASM do VectorCraft -->
   async function loadWasmApp() {
       try {
-        // Usa o CDN do jsDelivr para carregar o binário `.wasm` sem bloqueio de CORS
+        // Inicializa o WASM apontando diretamente para o caminho relativo ou URL correta do CDN
         const wasmUrl = "https://cdn.jsdelivr.net/gh/AnaJuhMilano/Hologram@main/vectorcraft/dist/web/vectorcraft-web-36ca77dd521e4273_bg.wasm";
-        const wasm = await init({ module_or_path: wasmUrl });
-        window.wasmBindings = bindings;
+        
+        // Garante que o Trunk/Wasm-bindgen inicialize corretamente com o fetch do CDN
+        const response = await fetch(wasmUrl);
+        const buffer = await response.arrayBuffer();
+        const wasm = await init(buffer);
+
+        window.wasmBindings = wasm;
         dispatchEvent(new CustomEvent("TrunkApplicationStarted", { detail: { wasm } }));
+        
         const loadingEl = document.getElementById("vectorcraft_loading");
         if (loadingEl) loadingEl.style.display = "none";
       } catch (err) {
