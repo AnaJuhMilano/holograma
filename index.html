@@ -207,21 +207,22 @@
   </script>
 
   <!-- Script de Inicialização do WASM do VectorCraft -->
-  async function loadWasmApp() {
+  <script type="module">
+    import init from "./vectorcraft/dist/web/vectorcraft-web-36ca77dd521e4273.js";
+
+    async function loadWasmApp() {
       try {
-        // Inicializa o WASM apontando diretamente para o caminho relativo ou URL correta do CDN
         const wasmUrl = "https://cdn.jsdelivr.net/gh/AnaJuhMilano/Hologram@main/vectorcraft/dist/web/vectorcraft-web-36ca77dd521e4273_bg.wasm";
         
-        // Garante que o Trunk/Wasm-bindgen inicialize corretamente com o fetch do CDN
-        const response = await fetch(wasmUrl);
-        const buffer = await response.arrayBuffer();
-        const wasm = await init(buffer);
+        // Inicializa o módulo WebAssembly do Rust através do binding oficial
+        const wasm = await init(wasmUrl);
 
         window.wasmBindings = wasm;
         dispatchEvent(new CustomEvent("TrunkApplicationStarted", { detail: { wasm } }));
         
         const loadingEl = document.getElementById("vectorcraft_loading");
         if (loadingEl) loadingEl.style.display = "none";
+        console.log("[VectorCraft] WASM carregado e inicializado com sucesso via CDN!");
       } catch (err) {
         console.error("Erro ao carregar o WASM do VectorCraft:", err);
       }
